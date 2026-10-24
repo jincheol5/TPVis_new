@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>TPVis</title>
+    <!-- Semantic UI -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.css">
+    <!-- my css -->
+    <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+    <div class="container">
+        <!-- 사이드바 -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2>TPVis</h2>
+            </div>
+            <div class="section">
+                <h4>Dataset</h4>
+                <div class="ui form">
+                    <div class="field">
+                        <select class="ui dropdown" id="dataset_select" style="width:100%">
+                            <option value="" selected disabled>Select Dataset</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label class="ui button" style="width:100%">
+                            <i class="upload icon"></i>
+                            Upload
+                            <input type="file" id="file_input" hidden accept=".txt">
+                        </label>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="section">
+                <h4>Temporal Path</h4>
+                <div class="ui form">
+                    <select class="ui dropdown" id="path_type" style="width:100%">
+                        <option value="" selected disabled>Select TP</option>
+                        <option value="foremost">Foremost Path</option>
+                        <option value="shortest">Shortest Path</option>
+                    </select>
+                </div>
+            </div>
+            <div class="section">
+                <h4>Time Range</h4>
+                <div class="ui form">
+                    <div class="field">
+                        <input id="start_time" type="text" placeholder="Start Time" style="width:100%">
+                    </div>
+                    <div class="field">
+                        <input id="end_time" type="text" placeholder="End Time" style="width:100%">
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h4>Time Interval</h4>
+                <div class="ui form">
+                    <div class="field">
+                        <div class="ui input" style="width:100%">
+                            <input id="time_interval" type="text" placeholder="Time Interval">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h4>Source ID</h4>
+                <div class="ui form">
+                    <div class="field">
+                        <div class="ui input" style="width:100%">
+                            <input id="source_id" type="text" placeholder="Source ID">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="visualize">
+                <div class="ui form">
+                    <button class="ui button" id="visualize" style="width:50%">
+                        Visualize
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 시각화 창 -->
+        <div class="content">
+            <svg id="background" width="100%" height="100%">
+                <g id="timeline"></g>
+                <g id="display"></g>
+            </svg>
+        </div>
+    </div>
+    <!-- Semantic UI -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.js"></script>
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- my js -->
+    <script type="module" src="main.js"></script>
+</body>
+</html>

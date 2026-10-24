@@ -1,0 +1,104 @@
+import networkx as nx
+import igraph as ig
+from pydantic import BaseModel
+from enum import Enum
+
+class PathType(str,Enum):
+    foremost="foremost"
+    shortest="shortest"
+
+class LayoutConfig(BaseModel):
+    dataset_name: str
+    path_type: PathType
+    source_id: int
+    start_time: int
+    end_time: int
+    time_interval: int
+    layout_width: float
+    layout_height: float
+
+class Layout:
+    """
+    layout_config
+        source_id
+        start_time
+        end_time
+        time_interval
+        layout_width
+        layout_height
+    """
+    def __init__(self,path_tree:nx.DiGraph):
+        self.path_tree=path_tree
+
+    def set_path_tree(self,path_tree:nx.DiGraph):
+        self.path_tree=path_tree
+
+    def initialize_node_pos(self):
+        for node in self.path_tree.nodes():
+            self.path_tree.nodes[node]['x_pos']=0.0
+            self.path_tree.nodes[node]['y_pos']=0.0
+
+    def compute_time_axis_list_and_pos(self,layout_config:dict):
+        """
+        len(time_axis_list)==1 인 경우 오류 
+        """
+        start_time=layout_config['start_time']
+        end_time=layout_config['end_time']
+        layout_width=layout_config['layout_width']
+
+        time_axis_list=[]
+        time_axis_pos={}
+
+        time_interval=layout_config['time_interval']
+        if time_interval==0.0:
+            time_axis_list=[self.path_tree.nodes[node]['time'] for node in self.path_tree.nodes()]
+            time_axis_list=sorted(set(time_axis_list)) # 중복 제거
+            x_pos_gap=float(layout_width/(len(time_axis_list)-1))
+            for i,time_axis in enumerate(time_axis_list):
+                time_axis_pos[time_axis]=i*x_pos_gap
+        else:
+            t=start_time
+            while t<end_time:
+                time_axis_list.append(t)
+                t+=time_interval
+            time_axis_list.append(end_time)
+
+            x_pos_gap=float(layout_width/(len(time_axis_list)-1))
+            for i,time_axis in enumerate(time_axis_list):
+                time_axis_pos[time_axis]=i*x_pos_gap
+        return time_axis_list,time_axis_pos
+
+    def compute_tpvis_layout(self,time_axis_pos:dict,layout_config:dict):
+        """
+        """
+        ### initialize node position
+        self.initialize_node_pos()
+
+        ### compute Reingold-Tilford layout using igraph
+        nx_nodes=list(self.path_tree.nodes())
+        node_to_idx={node:i for i,node in enumerate(nx_nodes)}
+        path_tree_ig=ig.Graph.from_networkx(self.path_tree)
+        node_key=f"{layout_config['source_id']}_{layout_config['start_time']}"
+        root_idx=node_to_idx[node_key]
+        layout=path_tree_ig.layout_reingold_tilford(root=[root_idx])
+
+        # path_tree_ig=ig.Graph.from_networkx(g=self.path_tree)
+        # nx_nodes=list(self.path_tree.nodes())
+        # layout=path_tree_ig.layout_reingold_tilford(root=[layout_config['source_id']])
+        pos={nx_nodes[i]:(layout[i][1],-layout[i][0]) for i in range(len(nx_nodes))}
+
+        ### scaling y position and update node attr 
+        ys=[p[1] for p in pos.values()]
+        min_y,max_y=min(ys),max(ys)
+        y_range=max_y-min_y if max_y>min_y else 1.0
+
+        ### set updated x, y position
+        for node,(x,y) in pos.items():
+            # set y position
+            y_scaled=(y-min_y)/y_range*layout_config["layout_height"]
+            self.path_tree.nodes[node]['y_pos']=float(y_scaled)
+            # set x position (mapping x position to correct time_axis pos)
+            valid_time=self.path_tree.nodes[node]['time']
+            self.path_tree.nodes[node]['x_pos']=time_axis_pos[valid_time]
+
+        return self.path_tree

@@ -1,0 +1,48 @@
+
+/* 전체 레이아웃 */
+.container{
+    display:flex; /* 요소들을 가로로 배치 */
+    height:100vh; /* 화면 높이의 100% */
+}
+
+/* 왼쪽 사이드바 */
+.sidebar{
+    width:15%;
+    background:#1b1c1d;
+    color:white;
+    padding:20px;
+    overflow-y:auto; /* sidebar 내에서 세로 내용이 넘치면 자동으로 스크롤 생성 */
+}
+
+/* 오른쪽 페이지 */
+.content{
+    flex:1; /* 남은 공간 모두 차지 */ 
+
+    display:flex;
+    flex-direction:column;   /* 위 → 아래 배치 */
+    justify-content:center;   /* 좌우 가운데 */
+    align-items:center;       /* 상하 가운데 */
+
+    padding:0px;
+    background:#f9f9f9;
+    overflow-y:auto; /* content 내에서 세로 내용이 넘치면 자동으로 스크롤 생성 */
+}
+
+/* 사이드바 logo */
+.logo{
+    text-align:center;
+}
+
+/* 사이드바 section */
+.section{
+    margin-top:25px; /* 위쪽 외부 여백 */
+    border-top:1px solid #333;
+    padding-top:15px;
+}
+
+/* 사이드바 visualize */
+.visualize{
+    margin-top:25px; /* 위쪽 외부 여백 */
+    padding-top:15px;
+    text-align:center;
+}
